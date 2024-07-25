@@ -46,7 +46,7 @@ class Util {
     return ffi.using((arena) {
       final ptr = arena<ffi.Uint8>(bytes);
       final len = call(() => readFunc(ptr));
-      return Uint8List.fromList(ptr.asTypedList(len));
+      return Uint8List.fromList(ptr.asTypedList(len < 0 ? 0 : len));
     });
   }
 
@@ -61,7 +61,9 @@ class Util {
 
   static String? fromUtf8(ffi.Pointer<ffi.Char> str) {
     if (str == ffi.nullptr) return null;
-    final length = str.cast<ffi.Utf8>().length;
+    final length = str
+        .cast<ffi.Utf8>()
+        .length;
     try {
       return utf8.decode(str.cast<ffi.Uint8>().asTypedList(length));
     } catch (_) {
